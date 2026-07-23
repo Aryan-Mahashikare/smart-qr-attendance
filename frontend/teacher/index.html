@@ -370,7 +370,7 @@ function renderAttendance(){
 
     if (!name || !roll_no) {
         statusMsg.innerText = "Please enter both Name and Roll Number.";
-        statusMsg.style.color = "red";
+        statusMsg.style.color = "#ef4444";
         return;
     }
 
@@ -385,21 +385,19 @@ function renderAttendance(){
 
         if (response.ok) {
             statusMsg.innerText = result.message;
-            statusMsg.style.color = "green";
+            statusMsg.style.color = "#22c55e";
             nameInput.value = '';
             rollInput.value = '';
             
-            // Refresh the live attendance list UI if your app uses a fetch function
-            if (typeof fetchAttendance === 'function') {
-                fetchAttendance();
-            }
+            // Sync with backend list and update UI
+            fetchAttendance();
         } else {
             statusMsg.innerText = result.error || "Failed to add student.";
-            statusMsg.style.color = "red";
+            statusMsg.style.color = "#ef4444";
         }
     } catch (err) {
         statusMsg.innerText = "Error connecting to backend.";
-        statusMsg.style.color = "red";
+        statusMsg.style.color = "#ef4444";
     }
 }
 
