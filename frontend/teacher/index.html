@@ -220,6 +220,17 @@ button{
       <br>
       <button class="primary" onclick="generateQR()">Generate QR</button>
     </div>
+  
+    <!-- Manual Attendance Section -->
+<div class="manual-entry-card" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px;">
+    <h3>Manual Attendance Entry</h3>
+    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <input type="text" id="manualName" placeholder="Student Name" style="padding: 8px; flex: 1;">
+        <input type="text" id="manualRoll" placeholder="Roll Number" style="padding: 8px; flex: 1;">
+        <button onclick="addManualAttendance()" style="padding: 8px 16px; cursor: pointer;">Add Student</button>
+    </div>
+    <p id="manualStatus" style="font-size: 0.9em; color: #555;"></p>
+</div>
 
     <div class="attendance">
       <h3>Attendance</h3>
@@ -349,6 +360,48 @@ function renderAttendance(){
   });
 }
 
+  async function addManualAttendance() {
+    const nameInput = document.getElementById('manualName');
+    const rollInput = document.getElementById('manualRoll');
+    const statusMsg = document.getElementById('manualStatus');
+
+    const name = nameInput.value.trim();
+    const roll_no = rollInput.value.trim();
+
+    if (!name || !roll_no) {
+        statusMsg.innerText = "Please enter both Name and Roll Number.";
+        statusMsg.style.color = "red";
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API}/api/manual-attendance`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, roll_no })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            statusMsg.innerText = result.message;
+            statusMsg.style.color = "green";
+            nameInput.value = '';
+            rollInput.value = '';
+            
+            // Refresh the live attendance list UI if your app uses a fetch function
+            if (typeof fetchAttendance === 'function') {
+                fetchAttendance();
+            }
+        } else {
+            statusMsg.innerText = result.error || "Failed to add student.";
+            statusMsg.style.color = "red";
+        }
+    } catch (err) {
+        statusMsg.innerText = "Error connecting to backend.";
+        statusMsg.style.color = "red";
+    }
+}
 
 /* QR */
 async function generateQR(){
