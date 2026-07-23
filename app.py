@@ -56,7 +56,7 @@ def generate_qr():
     current_qr["expires_at"] = time.time() + duration
     attendance.clear()
 
-    student_url = f"https://smart-qr-attendance-backend.onrender.com/student?token={token}"
+    student_url = f"https://aryan-mahashikare.github.io/smart-qr-attendance/frontend/student/?token={token}"
 
     img = qrcode.make(student_url)
     buf = io.BytesIO()
