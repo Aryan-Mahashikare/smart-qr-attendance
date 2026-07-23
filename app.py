@@ -142,28 +142,23 @@ def student_sw():
 
 @app.route('/api/manual-attendance', methods=['POST'])
 def manual_attendance():
-    data = request.get_json()
-    name = data.get('name')
-    roll_no = data.get('roll_no')
+    data = request.get_json() or {}
+    name = data.get('name', '').strip()
+    roll_no = data.get('roll_no', '').strip()
 
     if not name or not roll_no:
         return jsonify({'error': 'Name and Roll Number are required'}), 400
 
-    # Prevent duplicate manual entries if student already marked
-    existing = next((s for s in attendance_records if s['roll_no'] == roll_no), None)
-    if existing:
-        return jsonify({'message': f'{name} ({roll_no}) is already marked present!'}), 200
+    # Format to match the "Name (RollNo)" format stored by students
+    student_entry = f"{name} ({roll_no})"
 
-    # Record manual entry
-    record = {
-        'name': name,
-        'roll_no': roll_no,
-        'timestamp': datetime.now().strftime('%H:%M:%S'),
-        'method': 'Manual'
-    }
-    attendance_records.append(record)
+    if student_entry in attendance:
+        return jsonify({'message': f'{student_entry} is already marked present!'}), 200
 
-    return jsonify({'message': f'Successfully added {name} ({roll_no}) manually!'}), 200
+    # Add directly to the set
+    attendance.add(student_entry)
+
+    return jsonify({'message': f'Successfully added {student_entry}!'}), 200
 # ======================
 # ENTRY
 # ======================
